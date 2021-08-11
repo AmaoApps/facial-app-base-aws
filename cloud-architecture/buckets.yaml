@@ -1,0 +1,17 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  App Facil to installing buckets to save media files
+  
+Parameters:
+  Stage:
+    Type: String
+
+Resources:
+  BucketFacial: # logical ID
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: facial-app-media-files
+      Tags: # list of tags
+        - Key: CloudFormationLab
+          Value: JonSnow
+          

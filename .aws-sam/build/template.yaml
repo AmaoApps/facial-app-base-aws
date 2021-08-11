@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Facial-App Architecture from CloudFormation  '
+Parameters:
+  Stage:
+    Type: String
+Resources:
+  NestedStackBuckets:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        Stage:
+          Ref: Stage
+      Tags:
+      - Key: ProyID
+        Value: FACIAL-ID
+      TemplateURL: NestedStackBuckets\template.yaml
+  NestedStackFunctions:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        Stage:
+          Ref: Stage
+      Tags:
+      - Key: ProyID
+        Value: FACIAL-ID
+      TemplateURL: NestedStackFunctions\template.yaml
