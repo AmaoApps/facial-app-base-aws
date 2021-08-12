@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'Facial-App layer the network VPC, with an one private subnet and one public subnet'
+
+Parameters:
+  Stage:
+    Type: String
+  paramVpcCIDR:
+    Description: Enter the IP range (CIDR notation) for VPC
+    Type: String
+    Default: 10.192.0.0/16
+  paramPublicSubnet1CIDR:
+    Description: Enter the IP range (CIDR notation)  for the public subnet in AZ A
+    Type: String
+    Default: 10.192.10.0/24
+  paramPublicSubnet2CIDR:
+    Description: Enter the IP range (CIDR notation)  for the public subnet in AZ B
+    Type: String
+    Default: 10.192.11.0/24
+  paramUniqueName:
+    Description: Enter NameApp
+    Type: String
+    Default: FacialAppTag
+
+Resources:
+  #VPC 
+  # a) Create a VPC
+  FacialVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref paramVpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+      - Key: CloudFormationLab
+        Value:  !Ref paramUniqueName
+  
+  #Internet Gateway
+  # b) Create a Internet Gateway
+  FacialInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: CloudFormationLab
+        Value:  !Ref paramUniqueName
+
+  ##Attaching IG to VPC
+  # c) Attach the Internet Gateway to the VPC
+  VPCAttachmentIG:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref FacialVPC
+      InternetGatewayId: !Ref FacialInternetGateway
+
+  # a) Create a public route table for the VPC (will be public once it is associated with the Internet Gateway)
+  FacialAppPublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref FacialVPC
+      Tags:
+        - Key: Name
+          Value: !Ref paramUniqueName
+
+  # b) Associate the public route table with the Internet Gateway
+  FacialAppRoute:
+    Type: AWS::EC2::Route
+    DependsOn: VPCAttachmentIG
+    Properties:
+      RouteTableId: !Ref FacialAppPublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref FacialInternetGateway
+
+  #Creation
+  # c) Create a public subnet in AZ 1 (will be public once it is associated with public route table)
+  FacialAppSubnet1CIDR:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref FacialVPC
+      AvailabilityZone: !Select [ 0, !GetAZs '' ] # AZ 1
+      CidrBlock: !Ref paramPublicSubnet1CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Ref paramUniqueName
+  # Create a public subnet in AZ 2 (will be public once it is associated with public route table)
+  #myPublicSubnet2:
+  #  Type: AWS::EC2::Subnet
+  #  Properties:
+  #    VpcId: !Ref myVPC
+  #    AvailabilityZone: !Select [ 1, !GetAZs  '' ] # AZ 2
+  #    CidrBlock: !Ref paramPublicSubnet2CIDR
+  #    MapPublicIpOnLaunch: true
+  #    Tags:
+  #      - Key: Name
+  #        Value: !Ref paramUniqueName
+
+  # d) Associate the public route table with the public subnet in AZ 1
+  FacialSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref FacialAppPublicRouteTable
+      SubnetId: !Ref FacialAppSubnet1CIDR
+  # Associate the public route table with the public subnet in AZ 2
+  #myPublicSubnet2RouteTableAssociation:
+  #  Type: AWS::EC2::SubnetRouteTableAssociation
+  #  Properties:
+  #    RouteTableId: !Ref myPublicRouteTable
+  #    SubnetId: !Ref myPublicSubnet2

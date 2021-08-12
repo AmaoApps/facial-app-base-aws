@@ -7,6 +7,15 @@ Parameters:
     Type: String
 
 Resources:
+  StackNetworking:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+          Stage: !Ref Stage
+      Tags:
+        - Key: ProyID
+          Value: FACIAL-ID
+      TemplateURL: cloud-architecture/networking.yaml
   StackBuckets:
     Type: AWS::CloudFormation::Stack
     Properties:

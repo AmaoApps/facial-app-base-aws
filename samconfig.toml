@@ -6,6 +6,6 @@ stack_name = "stack-facial-app"
 s3_prefix = "stack-facial-app"
 region = "us-east-1"
 confirm_changeset = true
-capabilities = "CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND"
+capabilities = ["CAPABILITY_AUTO_EXPAND", "CAPABILITY_NAMED_IAM", "CAPABILITY_IAM"]
 parameter_overrides = "Stage=\"DEV\""
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-19xq7z7nnxi4p"
