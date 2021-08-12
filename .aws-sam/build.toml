@@ -6,6 +6,6 @@ codeuri = "C:\\Users\\User\\Documents\\Rakso\\Paku\\cloudformation-aws\\facial-a
 runtime = "nodejs14.x"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["NestedStackFunctions/HelloWorldFunction"]
+functions = ["StackApis/HelloWorldFunction"]
 
 [layer_build_definitions]
